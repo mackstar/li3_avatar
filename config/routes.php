@@ -24,4 +24,6 @@ Router::connect('/avatar/{:id:[0-9a-f]{24}}.jpg', array(), function($request) {
 	));
 });
 
+Router::connect('/avatars/search', array('Avatars::search'));
+
 

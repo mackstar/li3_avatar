@@ -21,7 +21,7 @@ class Avatar extends \lithium\core\StaticObject {
 	}
 
 	public static function find($record, $service=null) {
-		static::$_record = $record;
+		static::$_record = $record->data();
 		if ($service){
 			$method = 'get' . $service;
 			return self::$method();
@@ -40,44 +40,50 @@ class Avatar extends \lithium\core\StaticObject {
 	}
 
 	public static function getTwitter(){
-		if (isset(static::$_record->services->twitter)) {
-			$xml = simplexml_load_file(
-				'http://twitter.com/users/'.static::$_record->services->twitter.'.xml'
+		if (isset(static::$_record['services']['twitter'])) {
+			$xml = @simplexml_load_file(
+				'http://twitter.com/users/'.static::$_record['services']['twitter'].'.xml'
 			);
-			return str_replace(array('normal'), array('bigger'), $xml->profile_image_url);
+			if ($xml) {
+				return str_replace(array('normal'), array('bigger'), $xml->profile_image_url);
+			}
 		}
 		return null;
 	}
 
 	public static function getFacebook(){
-		if (isset(static::$_record->services->facebook)) {
+		if (isset(static::$_record['services']['facebook']) 
+			&& static::$_record['services']['facebook'] != '') {
 			$return  = 'http://graph.facebook.com/';
-			$return .= static::$_record->services->facebook.'/picture?type=large';
+			$return .= static::$_record['services']['facebook'].'/picture?type=large';
 			return $return;
 		}
 		return false;
 	}
 
 	public static function getGravatar(){
-		$image  = 'http://www.gravatar.com/avatar/' . md5(static::$_record->email) . '?d=404&s=';
-		$image .= static::$_options['size'] ?:72;
-		return $image;
+		if (isset(static::$_record['email'])) {
+			$image  = 'http://www.gravatar.com/avatar/' . md5(static::$_record['email']) . '?d=404&s=';
+			$image .= static::$_options['size'] ?:72;
+			return $image;
+		}
+		return false;
 	}
 
-	public static function getAvatar($record = null){
+	public static function getAvatar(){
 
-		if (static::$_record->avatar) {
-			return '/avatar/' . $record->avatar . 'jpg';
+		if (static::$_record['avatar']) {
+			return '/avatar/' . static::$_record['avatar'] . 'jpg';
 		}
 		return false;
 	}
 	
 	public static function grab($record) {
 		if ($record) {
-			static::$_record = $record;
+			static::$_record = $record->data();
 		}
-		if (static::$_record->avatar) {
-			return Avatars::find(static::$_record->avatar)->file->getBytes();
+		if (isset(static::$_record['avatar'])) {
+			return Avatars::find(static::$_record['avatar'])->file->getBytes();
 		}
 		
 		if ($result = static::loopPossiblities()) {
@@ -104,6 +110,21 @@ class Avatar extends \lithium\core\StaticObject {
 			return false;
 		}
 		return @file_get_contents($url);
+	}
+
+	public static function checkSources($params){
+		static::$_record = $params;
+		foreach (static::order() as $source) {
+			$method = 'get' . $source;
+			if ($result = static::grabSource(static::$method())) {
+				$json = json_decode($result);
+				if($json && is_object($json)){
+					return false;
+				}
+				return static::$method();
+			}
+		}
+		return false;
 	}
 
 }
