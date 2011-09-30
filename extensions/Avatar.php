@@ -77,7 +77,7 @@ class Avatar extends \lithium\core\StaticObject {
 		}
 		return false;
 	}
-	
+
 	public static function grab($record) {
 		if ($record) {
 			static::$_record = $record->data();
@@ -85,7 +85,7 @@ class Avatar extends \lithium\core\StaticObject {
 		if (isset(static::$_record['avatar'])) {
 			return Avatars::find(static::$_record['avatar'])->file->getBytes();
 		}
-		
+
 		if ($result = static::loopPossiblities()) {
 			$avatar = Avatars::saveFromService($result);
 			$record->avatar = $avatar->_id->__toString();
@@ -94,7 +94,7 @@ class Avatar extends \lithium\core\StaticObject {
 		}
 		return false;
 	}
-	
+
 	public static function loopPossiblities() {
 		foreach (static::order() as $source) {
 			$method = 'get' . $source;
@@ -104,7 +104,7 @@ class Avatar extends \lithium\core\StaticObject {
 		}
 		return false;
 	}
-	
+
 	public static function grabSource($url){
 		if (!$url) {
 			return false;
