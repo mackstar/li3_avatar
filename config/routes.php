@@ -6,7 +6,7 @@ use li3_avatar\models\Avatars;
 use li3_avatar\extensions\Avatar;
 use lithium\util\Inflector;
 
-Router::connect('/avatars/{:model}/{:id:[0-9a-f]{24}}.png', array(), function($request) {
+Router::connect('/avatars/{:model}/{:id}.png', array(), function($request) {
 	$class = 'app\models\\' . Inflector::camelize($request->model);
 	$record = $class::find($request->id);
 	$result = Avatar::grab($record);

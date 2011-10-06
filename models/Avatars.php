@@ -69,7 +69,7 @@ class Avatars extends \lithium\data\Model {
 		if ($params['data'] != null) {
 			if (!empty($params['data']['avatar']['name'])) {
 				$avatar = Avatars::resize($params['data']['avatar']);
-				$params['data']['avatar_id'] = $avatar->_id->__toString();
+				$params['data']['avatar_id'] = (string) $avatar->_id;
 				unset($params['data']['avatar']);
 			}
 		}

@@ -88,7 +88,7 @@ class Avatar extends \lithium\core\StaticObject {
 
 		if ($result = static::loopPossiblities()) {
 			$avatar = Avatars::saveFromService($result);
-			$record->avatar = $avatar->_id->__toString();
+			$record->avatar = (string) $avatar->_id;
 			$record->save();
 			return $avatar->file;
 		}
