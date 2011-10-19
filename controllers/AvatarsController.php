@@ -15,5 +15,4 @@ class AvatarsController extends \lithium\action\Controller {
 
 }
 
-
 ?>
