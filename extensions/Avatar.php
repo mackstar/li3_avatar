@@ -5,7 +5,6 @@ namespace li3_avatar\extensions;
 use li3_avatar\models\Avatars;
 use lithium\net\socket\Curl;
 
-
 class Avatar extends \lithium\core\StaticObject {
 
 	protected static $_record = null;
@@ -17,7 +16,6 @@ class Avatar extends \lithium\core\StaticObject {
 			'size' => 72
 		);
 		static::$_options = $default;
-
 	}
 
 	public static function find($record, $service=null) {
@@ -89,7 +87,6 @@ class Avatar extends \lithium\core\StaticObject {
 		if ($result = static::loopPossiblities()) {
 			$avatar = Avatars::saveFromService($result);
 			$record->avatar = (string) $avatar->_id;
-			$record->save();
 			return $avatar->file;
 		}
 		return false;
@@ -126,6 +123,6 @@ class Avatar extends \lithium\core\StaticObject {
 		}
 		return false;
 	}
-
 }
+
 ?>

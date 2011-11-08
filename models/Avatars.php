@@ -5,8 +5,7 @@ namespace li3_avatar\models;
 use li3_avatar\extensions\ImageException;
 
 class Avatars extends \lithium\data\Model {
-	
-	
+
 	protected $_meta = array('source' => 'fs.files', 'key' => '_id');
 
 	protected static $_types = array(
