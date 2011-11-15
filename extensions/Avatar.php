@@ -70,8 +70,8 @@ class Avatar extends \lithium\core\StaticObject {
 
 	public static function getAvatar(){
 
-		if (static::$_record['avatar']) {
-			return '/avatar/' . static::$_record['avatar'] . 'jpg';
+		if (static::$_record['avatar_id']) {
+			return '/avatar/' . static::$_record['avatar_id'] . 'jpg';
 		}
 		return false;
 	}
@@ -80,13 +80,16 @@ class Avatar extends \lithium\core\StaticObject {
 		if ($record) {
 			static::$_record = $record->data();
 		}
-		if (isset(static::$_record['avatar'])) {
-			return Avatars::find(static::$_record['avatar'])->file->getBytes();
+		if (isset(static::$_record['avatar_id'])) {
+			if($avatar = Avatars::find(static::$_record['avatar_id'])) {
+				return $avatar->file->getBytes();
+			}
 		}
 
 		if ($result = static::loopPossiblities()) {
 			$avatar = Avatars::saveFromService($result);
-			$record->avatar = (string) $avatar->_id;
+			$record->avatar_id = (string) $avatar->_id;
+			$record->save();
 			return $avatar->file;
 		}
 		return false;
