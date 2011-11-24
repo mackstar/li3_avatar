@@ -10,10 +10,22 @@ class Avatar extends \lithium\core\StaticObject {
 	protected static $_record = null;
 
 	protected static $_options = array();
+	
+	public static function config($options = false) {
+		if (!$options) {
+			return static::$_options;
+		}
+		if (is_array($options)) {
+			static::$_options = $options + static::$_options;
+			return true;
+		}
+		return static::$_options[$options];
+	}
 
 	public static function __init() {
 		$default = array(
-			'size' => 72
+			'size' => 72,
+			'default_image' => dirname(__DIR__).'/webroot/img/icon.png',
 		);
 		static::$_options = $default;
 	}

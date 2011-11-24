@@ -12,10 +12,9 @@ Router::connect('/avatars/{:model}/{:id}.png', array(), function($request) {
 	$result = Avatar::grab($record);
 	return new Response(array(
 		'headers' => array('Content-type' => 'image/png'),
-		'body' => $result ?: file_get_contents(dirname(__DIR__).'/webroot/img/icon.png')
+		'body' => $result ?: file_get_contents(Avatar::config('default_image'))
 	));
 });
-
 
 Router::connect('/avatar/{:id:[0-9a-f]{24}}.jpg', array(), function($request) {
 	return new Response(array(
@@ -25,5 +24,3 @@ Router::connect('/avatar/{:id:[0-9a-f]{24}}.jpg', array(), function($request) {
 });
 
 Router::connect('/avatars/search', array('Avatars::search'));
-
-
