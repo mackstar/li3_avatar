@@ -148,14 +148,31 @@ class Avatar extends \lithium\core\StaticObject {
 
 	/**
 	 * Grabs the avatar from the record where available. Returns false where not available.
+	 * 
+	 * This also returns false if it has been checked within the last 24 hrs.
 	 *
 	 * @param object $record A lithium model.
 	 * @return mixed Either the file data or false.
 	 */
 	public static function grab($record) {
 		if ($record) {
+			$expression = '/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/';
+			if ($record->avatar_id && preg_match($expression, $record->avatar_id)) {
+				$checked = strtotime($record->avatar_id);
+				$now = strtotime(date('Y-m-d H:i:s'));
+				if ($now - $checked < (60 * 60 * 24)) {
+					return false;
+				}
+			}
 			static::$_record = $record->data();
 		}
+
+		if (isset(static::$_record['avatar_id']) && static::$_record['avatar_id']!= null) {
+			if($avatar = Avatars::find(static::$_record['avatar_id'])) {
+				return $avatar->file->getBytes();
+			}
+		}
+
 		if (isset(static::$_record['avatar_id'])) {
 			if($avatar = Avatars::find(static::$_record['avatar_id'])) {
 				return $avatar->file->getBytes();
@@ -165,9 +182,11 @@ class Avatar extends \lithium\core\StaticObject {
 		if ($result = static::loopPossiblities()) {
 			$avatar = Avatars::saveFromService($result);
 			$record->avatar_id = (string) $avatar->_id;
-			$record->save();
+			$record->save(null, array('validate' => false));
 			return $avatar->file;
 		}
+		$record->avatar_id = date('Y-m-d H:i:s');
+		$record->save(null, array('validate' => false));
 		return false;
 	}
 
