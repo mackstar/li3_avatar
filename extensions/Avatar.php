@@ -154,10 +154,10 @@ class Avatar extends \lithium\core\StaticObject {
 	 * @param object $record A lithium model.
 	 * @return mixed Either the file data or false.
 	 */
-	public static function grab($record) {
+	public static function grab($record, $skipCache = false) {
 		if ($record) {
-			$expression = '/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/';
-			if ($record->avatar_id && preg_match($expression, $record->avatar_id)) {
+			$regex = '/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/';
+			if ($record->avatar_id && preg_match($regex, $record->avatar_id) && !$skipCache) {
 				$checked = strtotime($record->avatar_id);
 				$now = strtotime(date('Y-m-d H:i:s'));
 				if ($now - $checked < (60 * 60 * 24)) {
@@ -167,13 +167,7 @@ class Avatar extends \lithium\core\StaticObject {
 			static::$_record = $record->data();
 		}
 
-		if (isset(static::$_record['avatar_id']) && static::$_record['avatar_id']!= null) {
-			if($avatar = Avatars::find(static::$_record['avatar_id'])) {
-				return $avatar->file->getBytes();
-			}
-		}
-
-		if (isset(static::$_record['avatar_id'])) {
+		if ($record->hasAvatar()) {
 			if($avatar = Avatars::find(static::$_record['avatar_id'])) {
 				return $avatar->file->getBytes();
 			}

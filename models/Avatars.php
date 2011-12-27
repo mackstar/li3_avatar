@@ -44,10 +44,7 @@ class Avatars extends \lithium\data\Model {
 	public static function resize($image) {
 
 		try {
-			$imageName  = explode('.', $image['name']);
-			$type = $imageName[(count($imageName)-1)];
-			$method = 'imagecreatefrom' . static::$_types[strtolower($type)];
-			$image = $method($image['tmp_name']);
+			$image = imagecreatefromstring(file_get_contents($image['tmp_name']));
 			return self::processResize($image, 72);
 		} catch (Exception $e) {
 			throw new ImageException('Can\'t resize photo');
