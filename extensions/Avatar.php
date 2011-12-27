@@ -204,9 +204,9 @@ class Avatar extends \lithium\core\StaticObject {
 	 * This does actually check the avatar itself exists by using grabSource.
 	 *
 	 * @param array $params The parameters containing
-	 *              - email
-	 *              - services[facebook]
-	 *              - services[twitter]
+	 *              - `email`
+	 *              - `services[facebook]`
+	 *              - `services[twitter]`
 	 * @return mixed Either the url for image or false when not available.
 	 */
 	public static function checkSources($params){

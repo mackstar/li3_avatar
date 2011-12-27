@@ -4,10 +4,25 @@ namespace li3_avatar\models;
 
 use li3_avatar\extensions\ImageException;
 
+/**
+ * The `Avatars` model class is where the resizing and saving of data occurs. The data store uses 
+ * MongoDb's Grid FS storage system to save avatar data. When images are found and processed they 
+ * are done so with GD. This would be ideally changed to use the Imagine library in the near future.
+ */
 class Avatars extends \lithium\data\Model {
 
+	/**
+	 * Meta data as per Lithium model standards.
+	 *
+	 * @var array
+	 */
 	protected $_meta = array('source' => 'fs.files', 'key' => '_id');
 
+	/**
+	 * Types of possible file types
+	 *
+	 * @var array
+	 */
 	protected static $_types = array(
 		'jpg' => 'jpeg', 
 		'jpeg' => 'jpeg',
@@ -15,6 +30,17 @@ class Avatars extends \lithium\data\Model {
 		'gif' => 'gif',
 	);
 
+	/**
+	 * Triggers the resize after creating the image resource from data type as prescribed by GD.
+	 *
+	 * This is actually called once having been uploaded from a form. Using the data params to deal 		
+	 * with it. This has a preset image size of 72 pixels.
+	 *
+	 * @param string $image File parameter from form upload.
+	 * @throws ImageException when unable to create image data.
+	 * @return object Avatar document object after having been saved in the DB.
+	 *         this will be the result from the processResize() method.
+	 */
 	public static function resize($image) {
 
 		try {
@@ -29,6 +55,12 @@ class Avatars extends \lithium\data\Model {
 
 	}
 
+	/**
+	 * Saves the avatar from image collected from a service.
+	 *
+	 * @param string $image Byte data of image collected from a service
+	 * @return void
+	 */
 	public static function saveFromService($image) {
 		try {
 			$image = imagecreatefromstring($image);
@@ -40,6 +72,16 @@ class Avatars extends \lithium\data\Model {
 		return false;
 	}
 
+	/**
+	 * Process the resizing procedure based on desired size.
+	 *
+	 * This then goes on to save the data as bytes in the database using Grid FS.
+	 *
+	 * @param resource $image Image resource data.
+	 * @param int $desiredSize Desired image size. This will be squared though.
+	 * @throws ImageException when unable to save image data.
+	 * @return object The avatar object that has been saved in the database.
+	 */
 	public static function processResize($image, $desiredSize) {
 		$x = imagesx($image);
 		$y = imagesy($image);
@@ -64,6 +106,12 @@ class Avatars extends \lithium\data\Model {
 		throw new ImageException('Can\'t save bytes.');
 	}
 
+	/**
+	 * Saves the avatar from an uploaded image, from a form.
+	 *
+	 * @param array $params Form parameters as a resource.
+	 * @return void
+	 */
 	public static function saveFromForm(&$params) {
 		if ($params['data'] != null) {
 			if (!empty($params['data']['avatar']['name'])) {
