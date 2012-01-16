@@ -4,6 +4,7 @@ namespace li3_avatar\extensions;
 
 use li3_avatar\models\Avatars;
 use lithium\net\socket\Curl;
+use lithium\core\Environment;
 
 /**
  * A service class to process avatar availability for various services.
@@ -155,6 +156,9 @@ class Avatar extends \lithium\core\StaticObject {
 	 * @return mixed Either the file data or false.
 	 */
 	public static function grab($record, $skipCache = false) {
+		if (Environment::get() == 'test') {
+			return false;
+		}
 		if ($record) {
 			$regex = '/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/';
 			if ($record->avatar_id && preg_match($regex, $record->avatar_id) && !$skipCache) {
